@@ -6,3 +6,4 @@ class AuthStates(StatesGroup):
     age = State()
     phone = State()
     location = State()
+    get_answer = State()

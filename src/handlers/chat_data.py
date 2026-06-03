@@ -1,16 +1,11 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
-from random import choice
+from aiogram.types import (
+    Message
+)
 
 router = Router()
 
-hands = ['tas', 'qagaz', 'qayshi']
-
-@router.callback_query(F.data)
-async def callback(call: CallbackQuery):
-    user = call.data
-    bot = choice(hands)
-    if user == bot:
-        await call.message.answer(f"Ten'lik")
-    else:
-        await call.message.answer(f"Ten'lik emes")
+@router.message(F.text)
+async def text(message: Message):
+    text = message.text
+    await message.answer(f"Bot ushin bunday comanda tanis emes: {text}")

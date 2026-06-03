@@ -11,58 +11,47 @@ router = Router()
 @router.message(CommandStart())
 async def start(message: Message):
     u = message.from_user
-    k = [
-        [
-            KeyboardButton(text="Dizimnen o'tiw")
-        ],
-        [
-            KeyboardButton(text="Ja'rdem"),
-            KeyboardButton(text="Profil")
-        ]
-    ]
-    mark = ReplyKeyboardMarkup(keyboard=k, resize_keyboard=True)
-    await message.answer(f"Sa'lem, {u.first_name}  Iltimas kerekli bo'limdi saylan'!",
-                        reply_markup=mark)
+    await message.answer(f"Hello, {u.first_name}. Oyindi baslaw ushin game commandasin kiritin'!")
+    
+# @router.message(Command("help"))
+# async def help(message: Message):
+#     await message.answer("""
+# Bot haqqinda!
 
-@router.message(Command("help"))
-async def help(message: Message):
-    await message.answer("""
-Bot haqqinda!
+# Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
 
-Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
+# Dizimnen o'tiw:
+# 1. At kiritesiz
+# 2. Familya kiritesiz
+# 3. Jas kiritesiz
+# 4. Telefon nomer kiritesiz
 
-Dizimnen o'tiw:
-1. At kiritesiz
-2. Familya kiritesiz
-3. Jas kiritesiz
-4. Telefon nomer kiritesiz
+# Profil:
+# Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
 
-Profil:
-Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
+# Esletpe:
+# Mag'liwmatlardi tuwri kiritin'!                                                 
+# """)
 
-Esletpe:
-Mag'liwmatlardi tuwri kiritin'!                                                 
-""")
+# @router.message(F.text == "Ja'rdem")
+# async def help(message:Message):
+#     await message.answer("""
+# Bot haqqinda!
 
-@router.message(F.text == "Ja'rdem")
-async def help(message:Message):
-    await message.answer("""
-Bot haqqinda!
+# Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
 
-Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
+# Dizimnen o'tiw:
+# 1. At kiritesiz
+# 2. Familya kiritesiz
+# 3. Jas kiritesiz
+# 4. Telefon nomer kiritesiz
 
-Dizimnen o'tiw:
-1. At kiritesiz
-2. Familya kiritesiz
-3. Jas kiritesiz
-4. Telefon nomer kiritesiz
+# Profil:
+# Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
 
-Profil:
-Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
-
-Esletpe:
-Mag'liwmatlardi tuwri kiritin'!                                                 
-""")
+# Esletpe:
+# Mag'liwmatlardi tuwri kiritin'!                                                 
+# """)
     
 # @router.message(Command("contact"))
 # async def contact(message: Message):

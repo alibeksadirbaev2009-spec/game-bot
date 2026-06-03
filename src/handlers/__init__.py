@@ -7,4 +7,4 @@ from .states import router as state_router
 from .text import router as text_router
 routers = Router()
 
-routers.include_routers(cmd_router, state_router, call_router, chat_router, text_router)
+routers.include_routers(cmd_router, call_router, state_router, chat_router, text_router)

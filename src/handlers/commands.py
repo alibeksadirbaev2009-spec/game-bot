@@ -1,10 +1,10 @@
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import (
-    Message, 
-    KeyboardButton, 
-    ReplyKeyboardMarkup
-)
+from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from random import randint, choice
+from src.keyboards.game import math_symbols
+from src.states.auth import AuthStates
 
 router = Router()
 
@@ -12,6 +12,28 @@ router = Router()
 async def start(message: Message):
     u = message.from_user
     await message.answer(f"Hello, {u.first_name}. Oyindi baslaw ushin game commandasin kiritin'!")
+
+@router.message(Command("game"))
+async def state_game(message: Message, state: FSMContext):
+    a = randint(1, 100)
+    b = randint(1, 100)
+
+    belgi = choice(["+", "-", "*", "/"])
+    
+    if belgi == "+":
+        answer = a + b
+    elif belgi == "-":
+        answer = a - b
+    elif belgi == "*":
+        answer = a * b
+    else:
+        answer = a / b
+    
+    btns = math_symbols()
+    await state.update_data(belgi = belgi)
+    await message.answer(f"""Iltimas o'zin'iz kerekli dep bilgen belgini saylan'!
+{a} ? {b} = {answer}""", reply_markup=btns)
+    await state.set_state(AuthStates.get_answer)
     
 # @router.message(Command("help"))
 # async def help(message: Message):

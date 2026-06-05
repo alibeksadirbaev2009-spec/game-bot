@@ -3,13 +3,9 @@ from aiogram.types import (
     Message, 
     ReplyKeyboardMarkup, 
     KeyboardButton,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup
     )
 from aiogram.fsm.context import FSMContext
 from src.states.auth import AuthStates
-from aiogram.filters import Command
-import random
 
 router = Router()
 
@@ -88,57 +84,4 @@ async def get_location(message:Message, state: FSMContext):
     await state.clear()
  
 
-@router.message(Command("game"))
-async def state_game(message: Message, state: FSMContext):
-    await state.set_state(AuthStates.get_answer)
-    a = random.randint(1, 100)
-    b = random.randint(1, 100)
-
-    belgi = random.choice(["+", "-", "*", "/"])
-    challange = random.choice(
-        [
-        "10 * 10 / 2", 
-        "7 * 7 * 10", 
-        "11 / 11 *0", 
-        "100 / 1000 *10",
-        "9 * 9 + 1",
-        "8 * 8 - 8",
-        "6 * 6 * 2",
-        "12 * 12 / 3",
-        "15 * 2 * 2",
-        "20 / 2 + 5",
-        "7 * 8 - 10",
-        "14 / 2 * 3",
-        "9 * 3 * 2",
-        "100 / 10 + 7",
-        "5 * 5 * 5",
-        "18 / 3 + 4",
-        "11 * 2 - 6",
-        "16 / 4 * 5",
-        "25 - 5 * 3"
-        ]
-        )
-    
-    if belgi == "+":
-        answer = a + b
-    elif belgi == "-":
-        answer = a - b
-    elif belgi == "*":
-        answer = a * b
-    else:
-        answer = a / b
-    
-    tanlaw = [
-        [
-            InlineKeyboardButton(text="+", callback_data="first"),
-            InlineKeyboardButton(text="-", callback_data="second")
-        ],
-        [
-            InlineKeyboardButton(text="*", callback_data="third"),
-            InlineKeyboardButton(text="/", callback_data="fourth")
-        ]
-    ]
-    mark = InlineKeyboardMarkup(inline_keyboard=tanlaw)
-    await state.update_data(answer=answer, belgi = belgi)
-    await message.answer(f"""Iltimas o'zin'iz kerekli dep bilgen belgini saylan'!
-{a} ? {b} = {answer}""", reply_markup=mark)
+# BOUND - I/O -sirttag'i - async,        CPU - sync

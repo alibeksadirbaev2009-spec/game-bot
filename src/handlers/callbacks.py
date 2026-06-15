@@ -1,90 +1,79 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, Message
+from aiogram.types import CallbackQuery
 from random import choice
-from aiogram.fsm.context import FSMContext
-from src.states.auth import AuthStates
-from random import randint, choice
-from src.keyboards.game import math_symbols
-from src.keyboards.restartgame import restart
+from src.crud.users import UserRepo
 
 router = Router()
 
-@router.callback_query(AuthStates.get_answer)
-async def check_answer(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
 
-    correct = data["belgi"]
-    mapping = {
-        "first": "+",
-        "second": '-',
-        "third": "*",
-        "fourth": '/'
-    }
-    user_answer = mapping[callback.data]
-    btns = restart()
-    if user_answer == correct:
-        await callback.message.answer("Duris!", reply_markup=btns)
+hands = ['rock', 'paper', 'scissor']
+
+
+@router.callback_query(F.data)
+async def play_game(call: CallbackQuery):
+    await call.message.delete()
+    await call.answer()
+
+    user = call.data
+    bot = choice(hands)
+
+
+    if user == bot:
+        result = "Ten'lik"
+        await UserRepo.update_points(
+            telegram_id = call.from_user.id,
+            tie = 1
+        )
+
+    elif (
+        (user == 'rock' and bot == 'scissor') or
+        (user == 'paper' and bot == 'rock') or
+        (user == 'scissor' and bot == 'paper')
+    ):
+        result = "Siz uttin'iz"
+        await UserRepo.update_points(
+            telegram_id = call.from_user.id,
+            point = 1
+        )
+
+    elif (
+        (user == 'rock' and bot == 'paper') or 
+        (user == 'paper' and bot == 'scissor') or
+        (user == 'scissor' and bot == 'rock')
+    ):
+        result = "Bot utti"
+        await UserRepo.update_points(
+            telegram_id = call.from_user.id,
+            defeat = 1
+        )
+
     else:
-        await callback.message.answer(f"Qa'te!\nDuris juwap: {correct}", reply_markup=btns)
-
-    await state.clear()
-    await callback.answer()
-
-
-@router.callback_query(F.data == "re")
-async def restart_game(callback: CallbackQuery, state: FSMContext):
-        await callback.answer()
+        result = "Qa'telik"
         
-        a = randint(1, 100)
-        b = randint(1, 100)
 
-        belgi = choice(["+", "-", "*", "/"])
+    await call.message.answer(f"Siz: {user}\nBot: {bot}\nNa'tiyje: {result}")
 
-        if belgi == "+":
-            answer = a + b
-        elif belgi == "-":
-            answer = a - b
-        elif belgi == "*":
-            answer = a * b
-        else:
-            answer = a / b
+# @router.callback_query(F.data == "re")
+# async def restart_game(call: CallbackQuery):
+#     await call.answer()
 
-        await state.update_data(belgi=belgi)
-        btns = math_symbols()
-        await callback.message.answer(f"""Iltimas o'zin'iz kerekli dep bilgen belgini saylan'!
-{a} ? {b} = {answer}""",reply_markup=btns)
-        await state.set_state(AuthStates.get_answer)
-        
-        
-@router.callback_query(AuthStates.get_answer)
-async def check_answer(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-
-    correct = data["belgi"]
-    mapping = {
-        "first": "+",
-        "second": '-',
-        "third": "*",
-        "fourth": '/'
-    }
-    user_answer = mapping[callback.data]
-
-    btns = restart()
-    if user_answer == correct:
-        await callback.message.answer("Duris!", reply_markup=btns)
-    else:
-        await callback.message.answer(f"Qa'te!\nDuris juwap: {correct}", reply_markup=btns)
-    
-    await state.clear()
-    await callback.answer()
-
-# hands = ['tas', 'qagaz', 'qayshi']
-
-# @router.callback_query(F.data)
-# async def callback(call: CallbackQuery):
 #     user = call.data
 #     bot = choice(hands)
+
+
 #     if user == bot:
-#         await call.message.answer(f"Ten'lik")
+#         result = "Ten'lik"
+
+#     elif (
+#         (user == 'stone' and bot == 'scissor') or
+#         (user == 'paper' and bot == 'stone') or
+#         (user == 'scissor' and bot == 'paper')
+#     ):
+#         result = "Siz uttin'iz"
+
 #     else:
-#         await call.message.answer(f"Ten'lik emes")
+#         result = "Bot utti"
+
+#     await call.message.answer(f"Siz: {user}\nBot: {bot}\nNa'tiyje: {result}", reply_markup=restart())
+#     await call.message.answer("Taza oyin baslaw!",
+#     reply_markup=game())

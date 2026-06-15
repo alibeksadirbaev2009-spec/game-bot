@@ -3,15 +3,12 @@ from aiogram.types import (
     InlineKeyboardMarkup
 )
 
-def math_symbols() -> InlineKeyboardMarkup:
+def game() -> InlineKeyboardMarkup:
     btns = [
         [
-            InlineKeyboardButton(text="+", callback_data="first"),
-            InlineKeyboardButton(text="-", callback_data="second")
-        ],
-        [
-            InlineKeyboardButton(text="*", callback_data="third"),
-            InlineKeyboardButton(text="/", callback_data="fourth")   
+            InlineKeyboardButton(text="Rock", callback_data="rock"),
+            InlineKeyboardButton(text="Paper", callback_data="paper"),
+            InlineKeyboardButton(text="Scissor", callback_data="scissor")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=btns)

@@ -2,78 +2,95 @@ from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from random import randint, choice
-from src.keyboards.game import math_symbols
-from src.states.auth import AuthStates
+from src.keyboards.game import game
+from src.states.auth import AuthStates, Change_profile
+from src.crud.users import UserRepo
 
 router = Router()
 
 @router.message(CommandStart())
 async def start(message: Message):
-    u = message.from_user
+    u = message.from_user                                     
     await message.answer(f"Hello, {u.first_name}. Oyindi baslaw ushin game commandasin kiritin'!")
 
 @router.message(Command("game"))
-async def state_game(message: Message, state: FSMContext):
-    a = randint(1, 100)
-    b = randint(1, 100)
-
-    belgi = choice(["+", "-", "*", "/"])
+async def state_game(message: Message):
+    btns = game()
+    await message.answer(f"Kerekli qoldi saylan'.", reply_markup=btns)
     
-    if belgi == "+":
-        answer = a + b
-    elif belgi == "-":
-        answer = a - b
-    elif belgi == "*":
-        answer = a * b
+@router.message(Command("help"))
+async def help(message: Message):
+    await message.answer("""
+Bot haqqinda!
+
+Bul bot paydalaniwshilardi dizimnen o'tkeriw ushin jaratilg'an.
+
+Dizimnen o'tiw:
+1. At kiritesiz
+2. Familya kiritesiz
+3. Jas kiritesiz
+4. Telefon nomer kiritesiz
+
+Profil:
+Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
+
+Esletpe:
+Mag'liwmatlardi tuwri kiritin'!                                                 
+""")
+
+@router.message(Command("register"))
+async def sign_in(message: Message, state: FSMContext):
+    await state.set_state(AuthStates.name)
+    await message.answer("Atin'izdi kiritin':")
+
+@router.message(Command("stats"))
+async def get_statistics(message: Message):
+    data = await UserRepo.get_statas(message.from_user.id)
+
+    if data.total == 0:
+        win_rate = tie_rate = defeat_rate = 0
     else:
-        answer = a / b
-    
-    btns = math_symbols()
-    await state.update_data(belgi = belgi)
-    await message.answer(f"""Iltimas o'zin'iz kerekli dep bilgen belgini saylan'!
-{a} ? {b} = {answer}""", reply_markup=btns)
-    await state.set_state(AuthStates.get_answer)
-    
-# @router.message(Command("help"))
-# async def help(message: Message):
-#     await message.answer("""
-# Bot haqqinda!
+        win_rate = (data.point * 100) / data.total
+        tie_rate = (data.tie * 100) / data.total
+        defeat_rate = (data.defeat * 100) / data.total
 
-# Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
+    stat_text = f"""
+<b>Sizdin' statistikan'iz:</b>
 
-# Dizimnen o'tiw:
-# 1. At kiritesiz
-# 2. Familya kiritesiz
-# 3. Jas kiritesiz
-# 4. Telefon nomer kiritesiz
+🏆 Utiw: {data.point} | {round(win_rate, 1)}%
+🤝 Ten'lik: {data.tie} | {round(tie_rate, 1)}%
+💀 Utilis: {data.defeat} | {round(defeat_rate, 1)}%
+📊 Uliwma oyinlar sani: {data.total}
+"""
+    await message.answer(text=stat_text, parse_mode="HTML")
 
-# Profil:
-# Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
+@router.message(Command("profile"))
+async def profile(message: Message):
+    data = await UserRepo.get_user_by_telegram_id(message.from_user.id)
 
-# Esletpe:
-# Mag'liwmatlardi tuwri kiritin'!                                                 
-# """)
+    if not data:
+        await message.answer("Siz dizimnen o'tpegensiz!")
+        return
 
-# @router.message(F.text == "Ja'rdem")
-# async def help(message:Message):
-#     await message.answer("""
-# Bot haqqinda!
+    text = f"""
 
-# Bul bot paydalaniwshilardi dizimnen o'ykeriw ushin jaratilg'an.
+👤 <b>Profil</b>
+🆔 Telegram ID: {data.telegram_id}
+👨 At: {data.first_name}
+👤 Familiya: {data.lastname}
+🎂 Jas: {data.age}
+📞 Telefon: {data.phone}
+📍 Addres: {data.location}
+"""
+    await message.answer(text, parse_mode="HTML")
 
-# Dizimnen o'tiw:
-# 1. At kiritesiz
-# 2. Familya kiritesiz
-# 3. Jas kiritesiz
-# 4. Telefon nomer kiritesiz
+@router.message(Command("change_profile"))
+async def change_profil(message: Message, state: FSMContext):
+    await state.set_state(Change_profile.name)
+    await message.answer(f"Atin'izdi kiritin'!")
 
-# Profil:
-# Dizimnen o'tkennen keyin profilin'izdi ko'riwin'iz mu'mkin.
 
-# Esletpe:
-# Mag'liwmatlardi tuwri kiritin'!                                                 
-# """)
+# @router.message(Command())
     
 # @router.message(Command("contact"))
 # async def contact(message: Message):
